@@ -1,31 +1,20 @@
-// ייבוא הגדרות Supabase
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config.js';
+// הגדרות Supabase
+const SUPABASE_URL = 'https://bhyzswlinykqmijvxyeg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoeXpzd2xpbnlrcW1panZ4eWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NDIwODksImV4cCI6MjA2NTIxODA4OX0.b9A6uXSWAs26clkzXGrvgVtVjAYN9WMwCtk0K3TvulE';
 
-// אתחול משתנים עם ערכים ריקים - למניעת בעיות timing
+// אתחול משתנים
 let supabase = null;
 let loginForm = null;
 let messageDiv = null;
 
-// טעינת ספריית Supabase
-async function loadSupabase() {
-    try {
-        const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
-        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase נטען בהצלחה');
-    } catch (error) {
-        console.error('שגיאה בטעינת Supabase:', error);
-        showMessage('שגיאה בטעינת המערכת', 'error');
-    }
-}
-
-// התחלת האפליקציה
+// המתנה לטעינת ה-DOM ו-Supabase
 document.addEventListener('DOMContentLoaded', async () => {
+    // המתנה לטעינת Supabase
+    await waitForSupabase();
+    
     // עדכון המשתנים עם האלמנטים הקיימים
     loginForm = document.getElementById('loginForm');
     messageDiv = document.getElementById('message');
-    
-    // טעינת Supabase
-    await loadSupabase();
     
     // הוספת מאזיני אירועים
     initializeEventListeners();
@@ -33,6 +22,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // בדיקת סטטוס אימות
     checkAuthStatus();
 });
+
+// המתנה לטעינת Supabase
+async function waitForSupabase() {
+    let attempts = 0;
+    const maxAttempts = 20;
+    
+    while (!window.supabase && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+    
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase נטען בהצלחה');
+    } else {
+        console.error('שגיאה בטעינת Supabase');
+        showMessage('שגיאה בטעינת המערכת - נסה לרענן את הדף', 'error');
+    }
+}
 
 // הוספת מאזיני אירועים
 function initializeEventListeners() {
@@ -45,6 +53,11 @@ function initializeEventListeners() {
 async function handleLogin(event) {
     event.preventDefault();
     
+    if (!supabase) {
+        showMessage('המערכת עדיין נטענת - נסה שוב בעוד רגע', 'error');
+        return;
+    }
+    
     // ניקוי הודעות קודמות
     hideMessage();
     
@@ -55,14 +68,14 @@ async function handleLogin(event) {
     setLoadingState(true);
 
     try {
-        console.log('מנסה להתחבר עם:', email); // דיבוג
+        console.log('מנסה להתחבר עם:', email);
         
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password
         });
 
-        console.log('תגובה מ-Supabase:', { data, error }); // דיבוג
+        console.log('תגובה מ-Supabase:', { data, error });
 
         if (error) {
             throw error;
@@ -77,8 +90,6 @@ async function handleLogin(event) {
 
     } catch (error) {
         console.error('שגיאה בהתחברות:', error);
-        console.log('סוג השגיאה:', typeof error);
-        console.log('מאפייני השגיאה:', Object.keys(error));
         
         const errorMsg = getErrorMessage(error);
         console.log('הודעת שגיאה שתוצג:', errorMsg);
@@ -98,6 +109,8 @@ async function handleLogin(event) {
 
 // בדיקת סטטוס אימות
 async function checkAuthStatus() {
+    if (!supabase) return;
+    
     try {
         const { data: { user } } = await supabase.auth.getUser();
         
@@ -112,15 +125,15 @@ async function checkAuthStatus() {
 
 // הצגת הודעות למשתמש
 function showMessage(text, type = 'info') {
-    console.log('מציג הודעה:', text, 'סוג:', type); // דיבוג
+    console.log('מציג הודעה:', text, 'סוג:', type);
     
     if (messageDiv) {
         messageDiv.textContent = text;
         messageDiv.className = `message ${type}`;
         messageDiv.style.display = 'block';
-        console.log('הודעה הוצגה בהצלחה'); // דיבוג
+        console.log('הודעה הוצגה בהצלחה');
     } else {
-        console.error('messageDiv לא נמצא!'); // דיבוג
+        console.error('messageDiv לא נמצא!');
     }
 }
 
@@ -152,15 +165,15 @@ function setLoadingState(isLoading) {
 
 // המרת שגיאות Supabase להודעות מובנות
 function getErrorMessage(error) {
-    console.log('שגיאה מלאה:', error); // לדיבוג
-    console.log('הודעת שגיאה גולמית:', error.message); // לדיבוג
+    console.log('שגיאה מלאה:', error);
+    console.log('הודעת שגיאה גולמית:', error.message);
     
     const errorMessage = error.message || '';
-    console.log('הודעה לבדיקה:', errorMessage); // לדיבוג
+    console.log('הודעה לבדיקה:', errorMessage);
     
     // בדיקת הודעות שגיאה שונות של Supabase
     if (errorMessage.includes('Invalid login credentials')) {
-        console.log('זוהתה שגיאת התחברות'); // לדיבוג
+        console.log('זוהתה שגיאת התחברות');
         return 'אימייל או סיסמה שגויים - אולי עוד לא נרשמת?';
     }
     
@@ -189,6 +202,6 @@ function getErrorMessage(error) {
     }
     
     // אם אין התאמה, נציג את השגיאה המקורית
-    console.log('לא נמצאה התאמה - מחזיר הודעה כללית'); // לדיבוג
+    console.log('לא נמצאה התאמה - מחזיר הודעה כללית');
     return errorMessage || 'אירעה שגיאה לא צפויה - נסה שוב';
 } 

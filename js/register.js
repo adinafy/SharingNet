@@ -1,31 +1,20 @@
-// ייבוא הגדרות Supabase
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config.js';
+// הגדרות Supabase
+const SUPABASE_URL = 'https://bhyzswlinykqmijvxyeg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoeXpzd2xpbnlrcW1panZ4eWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk2NDIwODksImV4cCI6MjA2NTIxODA4OX0.b9A6uXSWAs26clkzXGrvgVtVjAYN9WMwCtk0K3TvulE';
 
-// אתחול משתנים עם ערכים ריקים - למניעת בעיות timing
+// אתחול משתנים
 let supabase = null;
 let registerForm = null;
 let messageDiv = null;
 
-// טעינת ספריית Supabase
-async function loadSupabase() {
-    try {
-        const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js@2');
-        supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase נטען בהצלחה');
-    } catch (error) {
-        console.error('שגיאה בטעינת Supabase:', error);
-        showMessage('שגיאה בטעינת המערכת', 'error');
-    }
-}
-
-// התחלת האפליקציה
+// המתנה לטעינת ה-DOM ו-Supabase
 document.addEventListener('DOMContentLoaded', async () => {
+    // המתנה לטעינת Supabase
+    await waitForSupabase();
+    
     // עדכון המשתנים עם האלמנטים הקיימים
     registerForm = document.getElementById('registerForm');
     messageDiv = document.getElementById('message');
-    
-    // טעינת Supabase
-    await loadSupabase();
     
     // הוספת מאזיני אירועים
     initializeEventListeners();
@@ -33,6 +22,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // בדיקת סטטוס אימות
     checkAuthStatus();
 });
+
+// המתנה לטעינת Supabase
+async function waitForSupabase() {
+    let attempts = 0;
+    const maxAttempts = 20;
+    
+    while (!window.supabase && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+    }
+    
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase נטען בהצלחה');
+    } else {
+        console.error('שגיאה בטעינת Supabase');
+        showMessage('שגיאה בטעינת המערכת - נסה לרענן את הדף', 'error');
+    }
+}
 
 // הוספת מאזיני אירועים
 function initializeEventListeners() {
@@ -44,6 +52,11 @@ function initializeEventListeners() {
 // טיפול בהרשמה
 async function handleRegister(event) {
     event.preventDefault();
+    
+    if (!supabase) {
+        showMessage('המערכת עדיין נטענת - נסה שוב בעוד רגע', 'error');
+        return;
+    }
     
     // ניקוי הודעות קודמות
     hideMessage();
@@ -123,6 +136,8 @@ async function handleRegister(event) {
 
 // בדיקת סטטוס אימות
 async function checkAuthStatus() {
+    if (!supabase) return;
+    
     try {
         const { data: { user } } = await supabase.auth.getUser();
         
@@ -172,7 +187,7 @@ function setLoadingState(isLoading) {
 
 // המרת שגיאות Supabase להודעות מובנות
 function getErrorMessage(error) {
-    console.log('שגיאה מלאה בהרשמה:', error); // לדיבוג
+    console.log('שגיאה מלאה בהרשמה:', error);
     
     const errorMessage = error.message || '';
     
@@ -199,6 +214,10 @@ function getErrorMessage(error) {
     
     if (errorMessage.includes('Network error') || errorMessage.includes('fetch')) {
         return 'בעיית חיבור לרשת - בדוק את החיבור לאינטרנט';
+    }
+    
+    if (errorMessage.includes('Database error')) {
+        return 'שגיאה במסד הנתונים - נסה שוב מאוחר יותר';
     }
     
     // אם אין התאמה, נציג את השגיאה המקורית
