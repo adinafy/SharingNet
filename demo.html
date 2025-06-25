@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SharingNet Demo - רשת חברתית</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .demo-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .demo-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+        .demo-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .features {
+            text-align: right;
+            margin-top: 30px;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        .features li {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🌐 SharingNet</h1>
+        <p class="subtitle">רשת חברתית פשוטה ומודרנית</p>
+        
+        <a href="index.html" class="demo-btn">🚀 פתח את האפליקציה</a>
+        
+        <div class="features">
+            <h3>תכונות עיקריות:</h3>
+            <ul>
+                <li>✅ הרשמה והתחברות מיידית (ללא אימות מייל)</li>
+                <li>✅ יצירת פוסטים ושיתוף תוכן</li>
+                <li>✅ לייקים ותגובות</li>
+                <li>✅ עיצוב רספונסיבי ומודרני</li>
+                <li>✅ תמיכה מלאה בעברית</li>
+            </ul>
+        </div>
+        
+        <div class="status">
+            <h4>📋 דרישות להפעלה:</h4>
+            <p>1. הגדירו את הטבלאות ב-Supabase (ראו README.md)</p>
+            <p>2. הריצו את הסקריפט database_setup.sql</p>
+            <p>3. בטלו אימות מייל ב-Authentication > Settings</p>
+            <p>4. התחילו להשתמש! הרשמה ללא אימות מייל</p>
+        </div>
+        
+        <p style="margin-top: 20px; opacity: 0.8;">
+            📖 לקריאת הוראות מלאות עיינו בקובץ README.md
+        </p>
+    </div>
+
+    <script>
+        // Check if running locally
+        if (location.protocol === 'file:') {
+            console.log('Running locally - make sure to use a local server for best results');
+        }
+        
+        // Simple test to check if Supabase is accessible
+        setTimeout(() => {
+            if (typeof window.supabase === 'undefined') {
+                console.log('Supabase library not loaded yet - this is normal for the demo page');
+            }
+        }, 1000);
+    </script>
+</body>
+</html> 
