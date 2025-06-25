@@ -34,16 +34,8 @@ BEGIN
     END IF;
 END$$;
 
--- מחיקת אימותי מייל (אם הטבלה קיימת)
-DO $$
-BEGIN
-    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'email_verifications') THEN
-        DELETE FROM email_verifications;
-        RAISE NOTICE 'נתונים נמחקו מטבלת email_verifications';
-    ELSE
-        RAISE NOTICE 'טבלת email_verifications לא קיימת';
-    END IF;
-END$$;
+-- הערה: טבלת email_verifications נמחקה לגמרי ולא צריכה ניקוי
+SELECT 'הערה: טבלת email_verifications נמחקה לגמרי כחלק מתיקון הבעיות' as notice;
 
 -- מחיקת פרופילים (אם הטבלה קיימת)
 DO $$
@@ -77,12 +69,23 @@ BEGIN
         RAISE NOTICE 'רצף posts_id_seq אופס';
     END IF;
     
-    -- איפוס רצף email_verifications
-    IF EXISTS (SELECT FROM information_schema.sequences WHERE sequence_name = 'email_verifications_id_seq') THEN
-        ALTER SEQUENCE email_verifications_id_seq RESTART WITH 1;
-        RAISE NOTICE 'רצף email_verifications_id_seq אופס';
-    END IF;
+    -- הערה: רצף email_verifications נמחק יחד עם הטבלה
+    RAISE NOTICE 'רצף email_verifications_id_seq נמחק יחד עם הטבלה';
 END$$;
 
+-- בדיקת סטטוס טבלאות
+SELECT 
+    'מחיקת נתונים הושלמה!' as message,
+    (SELECT COUNT(*) FROM auth.users) as users_count,
+    (SELECT COUNT(*) FROM profiles) as profiles_count,
+    (SELECT COUNT(*) FROM posts) as posts_count,
+    (SELECT COUNT(*) FROM likes) as likes_count,
+    (SELECT COUNT(*) FROM comments) as comments_count,
+    CASE 
+        WHEN EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'email_verifications') 
+        THEN '⚠️ טבלת email_verifications עדיין קיימת'
+        ELSE '✅ טבלת email_verifications נמחקה (כמתוכנן)'
+    END as email_verifications_status;
+
 -- הודעת סיום
-SELECT 'מחיקת נתונים הושלמה!' as message; 
+SELECT 'ניקוי נתונים הושלם! המערכת מוכנה לבדיקות חדשות.' as final_message; 

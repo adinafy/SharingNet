@@ -1,4 +1,4 @@
--- SharingNet Database Setup
+-- SharingNet Database Setup - גרסה מתוקנת
 -- Run this script in your Supabase SQL Editor
 -- 
 -- IMPORTANT: Disable email confirmation in Authentication > Settings
@@ -128,8 +128,6 @@ ON comments FOR DELETE
 TO authenticated
 USING (auth.uid() = user_id);
 
--- הערה: טבלת email_verifications נמחקה כי היא גרמה לבעיות ולא הייתה בשימוש
-
 -- Create indexes for better performance
 CREATE INDEX idx_posts_user_id ON posts(user_id);
 CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
@@ -187,7 +185,8 @@ CREATE TRIGGER on_auth_user_created
 -- Create trigger to handle email confirmation
 CREATE TRIGGER on_user_email_confirmed
     AFTER UPDATE OF email_confirmed_at ON auth.users
-    FOR EACH ROW WHEN (OLD.email_confirmed_at IS NULL AND NEW.email_confirmed_at IS NOT NULL)
+    FOR EACH ROW 
+    WHEN (OLD.email_confirmed_at IS NULL AND NEW.email_confirmed_at IS NOT NULL)
     EXECUTE FUNCTION public.handle_user_email_confirmation();
 
 -- בדיקת תקינות התקנה
