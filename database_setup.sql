@@ -150,8 +150,8 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- Disable email confirmation for immediate registration
--- Run this command or set it manually in Dashboard > Authentication > Settings
-UPDATE auth.config 
-SET email_confirmation_required = false
-WHERE true; 
+-- Enable email confirmation in Dashboard > Authentication > Settings
+-- You must manually enable this in the Supabase dashboard:
+-- 1. Go to Authentication > Settings
+-- 2. Set "Enable email confirmations" to ON
+-- 3. Configure your email templates if needed 
