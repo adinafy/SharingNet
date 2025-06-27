@@ -1,6 +1,8 @@
 // Like Remover - Deletes from likes table
 const LikeRemover = {
     async remove(postId) {
+        if (!(await EmailVerificationGuard.ensure())) return;
+        
         const { error } = await supabase
             .from('likes')
             .delete()

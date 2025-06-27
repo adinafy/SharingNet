@@ -1,8 +1,6 @@
 // Comment Loader - Fetches from comments table
 const CommentLoader = {
     async load(postId) {
-        if (!(await EmailVerificationGuard.ensure())) return;
-        
         try {
             const { data, error } = await supabase
                 .from('comments')

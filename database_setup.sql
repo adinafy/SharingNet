@@ -1,8 +1,8 @@
 -- SharingNet Database Setup
 -- Run this script in your Supabase SQL Editor
 -- 
--- IMPORTANT: Disable email confirmation in Authentication > Settings
--- Set "Enable email confirmations" to OFF for immediate user registration
+-- IMPORTANT: Enable email confirmation in Authentication > Settings
+-- Set "Enable email confirmations" to ON for full email verification
 
 -- 1. Create profiles table
 CREATE TABLE profiles (

@@ -1,6 +1,8 @@
 // Like Adder - Inserts into likes table
 const LikeAdder = {
     async add(postId) {
+        if (!(await EmailVerificationGuard.ensure())) return;
+        
         const { error } = await supabase
             .from('likes')
             .insert([
