@@ -41,10 +41,10 @@ const UserRegistration = {
                 if (error) throw error;
 
                 if (data.user && !data.session) {
-                    // User needs to verify email
+                    // User needs to verify email - DON'T try to access profiles table yet
                     AppState.setCurrentUser(data.user);
                     NavigationUI.showVerificationSection();
-                    MessageManager.success('נרשמת בהצלחה! נשלח אליך מייל אימות.');
+                    MessageManager.success('נרשמת בהצלחה! נשלח אליך מייל אימות. בדוק את המייל שלך ולחץ על הקישור.');
                 } else if (data.session) {
                     // User is immediately logged in (email confirmation disabled)
                     AppState.setCurrentUser(data.user);

@@ -1,6 +1,10 @@
 // Message Display System
 const MessageManager = {
     show(message, type = 'error') {
+        // Remove existing messages of the same type to avoid spam
+        const existingMessages = document.querySelectorAll(`.${type}-message`);
+        existingMessages.forEach(msg => msg.remove());
+        
         const messageEl = document.createElement('div');
         messageEl.className = `message ${type}-message`;
         messageEl.textContent = message;
@@ -17,15 +21,35 @@ const MessageManager = {
             background: ${this.getBackgroundColor(type)};
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            animation: slideInFromRight 0.3s ease-out;
         `;
+        
+        // Add close button for important messages
+        if (type === 'info' || type === 'warning') {
+            const closeBtn = document.createElement('span');
+            closeBtn.innerHTML = ' ×';
+            closeBtn.style.cssText = `
+                cursor: pointer;
+                font-size: 18px;
+                font-weight: bold;
+                margin-left: 10px;
+                opacity: 0.8;
+            `;
+            closeBtn.onclick = () => messageEl.remove();
+            messageEl.appendChild(closeBtn);
+        }
         
         document.body.appendChild(messageEl);
         
+        // Auto remove after delay (longer for important messages)
+        const delay = (type === 'error' || type === 'warning') ? 8000 : 5000;
         setTimeout(() => {
-            messageEl.style.opacity = '0';
-            messageEl.style.transform = 'translateX(100%)';
-            setTimeout(() => messageEl.remove(), 300);
-        }, 5000);
+            if (messageEl.parentNode) {
+                messageEl.style.opacity = '0';
+                messageEl.style.transform = 'translateX(100%)';
+                setTimeout(() => messageEl.remove(), 300);
+            }
+        }, delay);
     },
 
     getBackgroundColor(type) {

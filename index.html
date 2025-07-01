@@ -54,7 +54,15 @@
             gap: 8px;
         }
         
-
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
         
         .btn-secondary {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -102,6 +110,18 @@
         
         #verificationSection {
             animation: slideIn 0.5s ease-out;
+        }
+        
+        /* Animation for messages */
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
     </style>
 </head>

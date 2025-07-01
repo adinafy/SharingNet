@@ -33,5 +33,35 @@ const AppState = {
         this.userProfile = null;
         this.posts = [];
         this.isEmailVerified = false;
+    },
+
+    // Initialize cross-tab communication for email confirmation
+    initCrossTabSync() {
+        // Listen for email confirmation events from other tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'sharingnet_email_confirmed' && e.newValue) {
+                console.log('🔄 Email confirmation detected in another tab - cleaning up this tab');
+                
+                // Sign out and reset state in this tab
+                supabase.auth.signOut();
+                this.reset();
+                NavigationUI.showAuthSection();
+                
+                // Make sure we're on the login tab
+                if (DOM.loginTab && DOM.registerTab) {
+                    DOM.loginTab.classList.add('active');
+                    DOM.registerTab.classList.remove('active');
+                    DOM.loginForm.classList.remove('hidden');
+                    DOM.registerForm.classList.add('hidden');
+                }
+                
+                MessageManager.info('המייל אומת בטאב אחר. התחבר כאן עם המייל והסיסמה שלך.');
+                
+                // Clean up the localStorage after handling
+                setTimeout(() => {
+                    localStorage.removeItem('sharingnet_email_confirmed');
+                }, 1000);
+            }
+        });
     }
 }; 

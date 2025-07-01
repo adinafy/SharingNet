@@ -2,6 +2,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 SharingNet App Starting...');
     
+    // Initialize cross-tab synchronization for email confirmation
+    AppState.initCrossTabSync();
+    
     // Initialize all UI components
     AuthTabsUI.init();
     UserLogin.init();
