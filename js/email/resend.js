@@ -1,7 +1,11 @@
 // Email Resend Handler
 const EmailResend = {
     async handle() {
-        if (!AppState.currentUser?.email) {
+        // Get email from verification display instead of AppState (since we signed out)
+        const emailEl = document.getElementById('verificationEmail');
+        const email = emailEl?.textContent;
+        
+        if (!email) {
             MessageManager.error('לא נמצא כתובת מייל למשתמש');
             return;
         }
@@ -10,7 +14,7 @@ const EmailResend = {
             try {
                 const { error } = await supabase.auth.resend({
                     type: 'signup',
-                    email: AppState.currentUser.email
+                    email: email
                 });
 
                 if (error) throw error;

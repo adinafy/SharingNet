@@ -32,10 +32,7 @@ const NavigationUI = {
         DOM.verificationSection.classList.remove('hidden');
         DOM.userMenu.classList.add('hidden');
         
-        // Update verification email display
-        const emailEl = document.getElementById('verificationEmail');
-        if (emailEl && AppState.currentUser) {
-            emailEl.textContent = AppState.currentUser.email;
-        }
+        // Note: Email will be set manually in the registration handler
+        // since we no longer have AppState.currentUser after signOut
     }
 }; 

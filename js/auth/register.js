@@ -41,9 +41,17 @@ const UserRegistration = {
                 if (error) throw error;
 
                 if (data.user && !data.session) {
-                    // User needs to verify email - DON'T try to access profiles table yet
-                    AppState.setCurrentUser(data.user);
+                    // User needs to verify email - sign out immediately to prevent session issues
+                    await supabase.auth.signOut();
+                    AppState.reset();
                     NavigationUI.showVerificationSection();
+                    
+                    // Set email for verification display
+                    const emailEl = document.getElementById('verificationEmail');
+                    if (emailEl) {
+                        emailEl.textContent = email;
+                    }
+                    
                     MessageManager.success('נרשמת בהצלחה! נשלח אליך מייל אימות. בדוק את המייל שלך ולחץ על הקישור.');
                 } else if (data.session) {
                     // User is immediately logged in (email confirmation disabled)

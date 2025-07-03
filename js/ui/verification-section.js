@@ -49,9 +49,7 @@ const VerificationUI = {
         
         if (backToLoginBtn) {
             backToLoginBtn.addEventListener('click', () => {
-                // Sign out and go back to login
-                supabase.auth.signOut();
-                AppState.reset();
+                // Already signed out, just go back to login
                 NavigationUI.showAuthSection();
                 MessageManager.info('חזרת למסך ההתחברות. לאחר אימות המייל תוכל להתחבר.');
             });
@@ -59,27 +57,8 @@ const VerificationUI = {
         
         if (refreshStatusBtn) {
             refreshStatusBtn.addEventListener('click', async () => {
-                MessageManager.info('בודק מצב אימות...');
-                
-                try {
-                    // Get fresh session from Supabase
-                    const { data: { session }, error } = await supabase.auth.getSession();
-                    
-                    if (error) throw error;
-                    
-                    if (session && session.user) {
-                        AppState.setCurrentUser(session.user);
-                        await EmailVerificationChecker.check();
-                        MessageManager.success('מצב האימות עודכן!');
-                    } else {
-                        MessageManager.warning('עדיין לא מאומת. נסה להתחבר ידנית.');
-                        NavigationUI.showAuthSection();
-                    }
-                } catch (error) {
-                    console.error('Status refresh error:', error);
-                    MessageManager.error('שגיאה בבדיקת מצב. נסה להתחבר ידנית.');
-                    NavigationUI.showAuthSection();
-                }
+                MessageManager.info('מכיוון שנתקת מהמערכת, אנא התחבר כדי לבדוק את מצב האימות.');
+                NavigationUI.showAuthSection();
             });
         }
         
@@ -88,7 +67,11 @@ const VerificationUI = {
         }
         
         if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => UserLogout.handle());
+            logoutBtn.addEventListener('click', () => {
+                // Already signed out, just go to auth section
+                NavigationUI.showAuthSection();
+                MessageManager.info('חזרת למסך ההתחברות.');
+            });
         }
     }
 }; 
