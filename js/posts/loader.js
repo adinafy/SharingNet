@@ -1,6 +1,12 @@
 // Post Loader - Fetches from posts table
 const PostLoader = {
     async load() {
+        // Only load posts for verified users
+        if (!AppState.isEmailVerified) {
+            console.log('📧 Skipping post loading - email not verified');
+            return;
+        }
+        
         await LoadingManager.wrap(async () => {
             try {
                 const { data, error } = await supabase

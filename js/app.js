@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (event === 'SIGNED_IN' && session) {
             AppState.setCurrentUser(session.user);
-            await EmailVerificationChecker.check();
+            await EmailVerificationChecker.check(false); // false = from auth state change
         } else if (event === 'SIGNED_OUT') {
             AppState.reset();
             NavigationUI.showAuthSection();

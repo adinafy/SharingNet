@@ -12,7 +12,7 @@ const SessionChecker = {
             
             if (session && session.user) {
                 AppState.setCurrentUser(session.user);
-                await EmailVerificationChecker.check();
+                await EmailVerificationChecker.check(false); // false = from session check
             } else {
                 NavigationUI.showAuthSection();
             }

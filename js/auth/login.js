@@ -29,11 +29,10 @@ const UserLogin = {
                 if (error) throw error;
 
                 AppState.setCurrentUser(data.user);
-                await EmailVerificationChecker.check();
                 
-                if (AppState.isEmailVerified) {
-                    MessageManager.success('התחברת בהצלחה!');
-                }
+                // Check verification status - but don't force to verification if already verified
+                await EmailVerificationChecker.checkAfterLogin();
+                
             } catch (error) {
                 console.error('Login error:', error);
                 MessageManager.error(error.message || 'שגיאה בהתחברות');

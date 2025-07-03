@@ -56,7 +56,7 @@ const UserRegistration = {
                 } else if (data.session) {
                     // User is immediately logged in (email confirmation disabled)
                     AppState.setCurrentUser(data.user);
-                    await EmailVerificationChecker.check();
+                    await EmailVerificationChecker.check(true); // true = from registration
                     MessageManager.success('נרשמת בהצלחה!');
                 }
             } catch (error) {
