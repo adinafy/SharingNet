@@ -26,7 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (event === 'SIGNED_IN' && session) {
             AppState.setCurrentUser(session.user);
-            await EmailVerificationChecker.check(false); // false = from auth state change
+            
+            // Don't auto-navigate if we just handled email confirmation
+            // Let the user manually log in instead
+            if (!handledEmailConfirmation) {
+                await EmailVerificationChecker.check(false); // false = from auth state change
+            } else {
+                console.log('🔗 Skipping auto-navigation after email confirmation - waiting for manual login');
+            }
         } else if (event === 'SIGNED_OUT') {
             AppState.reset();
             NavigationUI.showAuthSection();
