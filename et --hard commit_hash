@@ -1,0 +1,22 @@
+[33m2563a6e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m הוספת לוגים מפורטים לדיבוג בעיית שגיאת 403 בטעינת פוסטים
+[33mcc3ce13[m Add button styles and enhance verification instructions
+[33m216c10b[m Refactor email verification handling and UI updates
+[33m011b781[m Simplified email verification screen - removed timer and unnecessary buttons
+[33m9344ceb[m Refactor email verification flow and update README
+[33m8ab6857[m Enhance email verification process and UI interactions
+[33m256c4fd[m readme update
+[33m0acf870[m Update email verification settings and enforce verification in like/comment actions
+[33m82fc01e[m Add .gitignore and restructure JavaScript files for modularity
+[33m766801d[m Update script.js with new binary changes reflecting recent improvements to email verification functionality.
+[33m269a2e3[m Update script.js with new binary changes following recent enhancements to email verification functionality.
+[33md62597e[m Update script.js with new binary changes after email verification
+[33m06378ee[m Remove the database setup script for SharingNet, consolidating all necessary SQL commands and logic into the main setup process.
+[33mf77f3ee[m update clear data
+[33m26aa5b4[m Remove refresh button
+[33me5805f4[m Refactor email verification handling: remove email_verifications table and related logic, update database setup script, and enhance data cleanup process with status checks.
+[33ma10c6ee[m Remove deprecated SQL files related to email verification and missing tables, consolidating functionality into the main database setup script.
+[33m6ef9752[m שיפורים באימות המייל ברשת החברתית - הוספת אפשרות לאימות מייל מלאה
+[33m05190d7[m הוסף אימות מייל מלא לרשת החברתית
+[33m9aa2161[m רשת חברתית מחודשת - SharingNet עם Supabase ללא אימות מייל
+[33m548d9e2[m first version
+[33m747058c[m first commit
