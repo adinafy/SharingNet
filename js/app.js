@@ -2,18 +2,12 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Initialize UI components
-        NavigationUI.init();
         AuthTabsUI.init();
         
         // Initialize auth handlers
-        if (DOM.loginForm) {
-            DOM.loginForm.addEventListener('submit', (e) => LoginHandler.handleLogin(e));
-        }
-        
-        // Initialize other handlers
-        LogoutHandler.init();
-        RegisterHandler.init();
-        EmailResendHandler.init();
+        UserLogin.init();
+        UserLogout.init();
+        UserRegistration.init();
         
         // Check initial session
         await SessionChecker.check();
