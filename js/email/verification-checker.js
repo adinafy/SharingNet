@@ -15,21 +15,20 @@ const EmailVerificationChecker = {
         console.log('Checking email verification from profiles table...');
         console.log('Check called from login:', fromLogin);
         
-        const currentUser = AppState.getCurrentUser();
-        if (!currentUser) {
+        if (!AppState.currentUser) {
             console.log('No current user found');
             return;
         }
 
-        console.log('Current user ID:', currentUser.id);
-        console.log('Current user email:', currentUser.email);
-        console.log('Current user email_confirmed_at:', currentUser.email_confirmed_at);
+        console.log('Current user ID:', AppState.currentUser.id);
+        console.log('Current user email:', AppState.currentUser.email);
+        console.log('Current user email_confirmed_at:', AppState.currentUser.email_confirmed_at);
 
         try {
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', currentUser.id)
+                .eq('id', AppState.currentUser.id)
                 .single();
 
             console.log('Profile found:', profile);
@@ -39,26 +38,29 @@ const EmailVerificationChecker = {
                 console.log('Profile created_at:', profile.created_at);
                 console.log('Profile updated_at:', profile.updated_at);
 
+                // Set profile in state
+                AppState.setUserProfile(profile);
+
                 // If email is already verified, no need to check further
                 if (profile.email_verified) {
                     console.log('Email is already verified');
-                    AppState.isEmailVerified = true;
+                    AppState.setEmailVerified(true);
                     return;
                 }
 
                 // Check if email was confirmed in auth but not in profile
-                if (currentUser.email_confirmed_at) {
-                    console.log('AppState.isEmailVerified after setUserProfile:', true);
+                if (AppState.currentUser.email_confirmed_at) {
+                    console.log('Email confirmed in auth, updating profile');
                     await supabase
                         .from('profiles')
                         .update({ email_verified: true })
-                        .eq('id', currentUser.id);
+                        .eq('id', AppState.currentUser.id);
                     
-                    AppState.isEmailVerified = true;
+                    AppState.setEmailVerified(true);
                     console.log('Email is verified');
                 } else {
-                    AppState.isEmailVerified = false;
-                    console.log('Email is verified - waiting for manual login');
+                    AppState.setEmailVerified(false);
+                    console.log('Email is not verified - waiting for manual login');
                 }
             }
         } catch (error) {
