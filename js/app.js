@@ -27,12 +27,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (event === 'SIGNED_IN' && session) {
             AppState.setCurrentUser(session.user);
             
-            // Don't auto-navigate if we just handled email confirmation
-            // Let the user manually log in instead
+            // אל תעבור אוטומטית למסך הראשי אחרי אימות מייל
             if (!handledEmailConfirmation) {
                 await EmailVerificationChecker.check(false); // false = from auth state change
             } else {
+                // נשארים במסך התחברות, מחכים שהמשתמש יתחבר ידנית
                 console.log('🔗 Skipping auto-navigation after email confirmation - waiting for manual login');
+                NavigationUI.showAuthSection();
+                if (DOM.loginTab && DOM.registerTab) {
+                    DOM.loginTab.classList.add('active');
+                    DOM.registerTab.classList.remove('active');
+                    DOM.loginForm.classList.remove('hidden');
+                    DOM.registerForm.classList.add('hidden');
+                }
+                MessageManager.success('המייל אומת בהצלחה! כעת התחבר עם המייל והסיסמה שלך.');
             }
         } else if (event === 'SIGNED_OUT') {
             AppState.reset();
