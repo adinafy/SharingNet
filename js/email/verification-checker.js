@@ -50,15 +50,27 @@ const EmailVerificationChecker = {
                 console.log('🔍 AppState.isEmailVerified after setUserProfile:', AppState.isEmailVerified);
                 
                 if (AppState.isEmailVerified) {
-                    // Email is verified - go to main app
-                    console.log('✅ Email is verified - going to main app');
-                    NavigationUI.showMainApp();
-                    await PostLoader.load();
+                    // Email is verified
+                    console.log('✅ Email is verified');
                     if (fromLogin) {
+                        // רק אם זו התחברות רגילה, עבור למסך הראשי
+                        console.log('✅ Email is verified - going to main app (from login)');
+                        NavigationUI.showMainApp();
+                        await PostLoader.load();
                         MessageManager.success('ברוכים הבאים! התחברת בהצלחה.');
                     } else {
-                        MessageManager.success('ברוכים הבאים! המייל אומת בהצלחה.');
+                        // אם זה לא מהתחברות, הישאר במסך התחברות
+                        console.log('✅ Email is verified - waiting for manual login');
+                        NavigationUI.showAuthSection();
+                        if (DOM.loginTab && DOM.registerTab) {
+                            DOM.loginTab.classList.add('active');
+                            DOM.registerTab.classList.remove('active');
+                            DOM.loginForm.classList.remove('hidden');
+                            DOM.registerForm.classList.add('hidden');
+                        }
+                        MessageManager.success('המייל אומת בהצלחה! כעת התחבר עם המייל והסיסמה שלך.');
                     }
+                    return;
                 } else {
                     console.log('❌ Email is NOT verified');
                     console.log('🔍 fromLogin parameter:', fromLogin);
