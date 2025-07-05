@@ -31,7 +31,7 @@ const UserLogin = {
                 AppState.setCurrentUser(data.user);
                 
                 // Check verification status - but don't force to verification if already verified
-                await EmailVerificationChecker.checkAfterLogin();
+                await EmailVerificationChecker.check(true);
                 
             } catch (error) {
                 console.error('Login error:', error);
