@@ -1,107 +1,68 @@
 // Email Verification Checker - Uses profiles table
 const EmailVerificationChecker = {
+    _lastCheckTimestamp: 0,
+    _minimumCheckInterval: 2000, // 2 seconds
+
     async check(fromLogin = false) {
-        if (!AppState.currentUser) {
-            console.log('🚫 No current user, redirecting to auth section');
-            NavigationUI.showAuthSection();
+        // Prevent too frequent checks
+        const now = Date.now();
+        if (now - this._lastCheckTimestamp < this._minimumCheckInterval) {
+            console.log('Skipping verification check - too soon');
             return;
         }
+        this._lastCheckTimestamp = now;
+
+        console.log('Checking email verification from profiles table...');
+        console.log('Check called from login:', fromLogin);
         
-        console.log('🔍 Checking email verification from profiles table...');
-        console.log('🔍 Check called from login:', fromLogin);
-        console.log('🔍 Current user ID:', AppState.currentUser.id);
-        console.log('🔍 Current user email:', AppState.currentUser.email);
-        console.log('🔍 Current user email_confirmed_at:', AppState.currentUser.email_confirmed_at);
-        
+        const currentUser = AppState.getCurrentUser();
+        if (!currentUser) {
+            console.log('No current user found');
+            return;
+        }
+
+        console.log('Current user ID:', currentUser.id);
+        console.log('Current user email:', currentUser.email);
+        console.log('Current user email_confirmed_at:', currentUser.email_confirmed_at);
+
         try {
-            // Get user profile from profiles table (not auth.users)
-            const { data: profile, error } = await supabase
+            const { data: profile } = await supabase
                 .from('profiles')
-                .select('id, full_name, email, email_verified, created_at, updated_at')
-                .eq('id', AppState.currentUser.id)
+                .select('*')
+                .eq('id', currentUser.id)
                 .single();
 
-            if (error) {
-                console.error('❌ Error getting profile:', error);
-                console.error('❌ Error code:', error.code);
-                console.error('❌ Error message:', error.message);
-                
-                // If profile doesn't exist, user might be newly created
-                if (error.code === 'PGRST116') {
-                    console.log('⏳ Profile not found, user might be newly created - retrying in 1 second...');
-                    // Wait a moment and try again
-                    setTimeout(() => this.check(fromLogin), 1000);
-                    return;
-                }
-                
-                console.log('🔄 Redirecting to auth section due to profile error');
-                NavigationUI.showAuthSection();
-                return;
-            }
+            console.log('Profile found:', profile);
 
             if (profile) {
-                console.log('✅ Profile found:', profile);
-                console.log('📧 Profile email_verified field:', profile.email_verified);
-                console.log('📅 Profile created_at:', profile.created_at);
-                console.log('📅 Profile updated_at:', profile.updated_at);
-                
-                AppState.setUserProfile(profile);
-                
-                console.log('🔍 AppState.isEmailVerified after setUserProfile:', AppState.isEmailVerified);
-                
-                if (AppState.isEmailVerified) {
-                    // Email is verified
-                    console.log('✅ Email is verified');
-                    if (fromLogin) {
-                        // רק אם זו התחברות רגילה, עבור למסך הראשי
-                        console.log('✅ Email is verified - going to main app (from login)');
-                        NavigationUI.showMainApp();
-                        await PostLoader.load();
-                        MessageManager.success('ברוכים הבאים! התחברת בהצלחה.');
-                    } else {
-                        // אם זה לא מהתחברות, הישאר במסך התחברות
-                        console.log('✅ Email is verified - waiting for manual login');
-                        NavigationUI.showAuthSection();
-                        if (DOM.loginTab && DOM.registerTab) {
-                            DOM.loginTab.classList.add('active');
-                            DOM.registerTab.classList.remove('active');
-                            DOM.loginForm.classList.remove('hidden');
-                            DOM.registerForm.classList.add('hidden');
-                        }
-                        MessageManager.success('המייל אומת בהצלחה! כעת התחבר עם המייל והסיסמה שלך.');
-                    }
+                console.log('Profile email_verified field:', profile.email_verified);
+                console.log('Profile created_at:', profile.created_at);
+                console.log('Profile updated_at:', profile.updated_at);
+
+                // If email is already verified, no need to check further
+                if (profile.email_verified) {
+                    console.log('Email is already verified');
+                    AppState.isEmailVerified = true;
                     return;
-                } else {
-                    console.log('❌ Email is NOT verified');
-                    console.log('🔍 fromLogin parameter:', fromLogin);
-                    
-                    // Email not verified - only show verification if this is from login or registration
-                    // Don't automatically redirect to verification from other places
-                    if (fromLogin) {
-                        console.log('📧 Showing verification section because called from login');
-                        NavigationUI.showVerificationSection();
-                        // Set email for verification display
-                        const emailEl = document.getElementById('verificationEmail');
-                        if (emailEl && profile.email) {
-                            emailEl.textContent = profile.email;
-                            console.log('📧 Set verification email display to:', profile.email);
-                        }
-                        MessageManager.warning('עליך לאמת את המייל שלך לפני הכניסה למערכת. בדוק את תיבת הדואר שלך.');
-                    } else {
-                        // If called from other places and email not verified, go back to auth
-                        console.log('🔄 Email not verified, redirecting to auth section (not from login)');
-                        NavigationUI.showAuthSection();
-                        MessageManager.info('עליך לאמת את המייל שלך ולהתחבר מחדש.');
-                    }
                 }
-            } else {
-                console.log('❌ No profile found for user (profile is null)');
-                NavigationUI.showAuthSection();
+
+                // Check if email was confirmed in auth but not in profile
+                if (currentUser.email_confirmed_at) {
+                    console.log('AppState.isEmailVerified after setUserProfile:', true);
+                    await supabase
+                        .from('profiles')
+                        .update({ email_verified: true })
+                        .eq('id', currentUser.id);
+                    
+                    AppState.isEmailVerified = true;
+                    console.log('Email is verified');
+                } else {
+                    AppState.isEmailVerified = false;
+                    console.log('Email is verified - waiting for manual login');
+                }
             }
         } catch (error) {
-            console.error('❌ Exception in email verification check:', error);
-            console.error('❌ Exception stack:', error.stack);
-            NavigationUI.showAuthSection();
+            console.error('Error checking email verification:', error);
         }
     }
 }; 
