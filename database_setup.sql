@@ -51,10 +51,16 @@ ON posts FOR SELECT
 TO authenticated
 USING (true);
 
-CREATE POLICY "Users can create posts"
+CREATE POLICY "Verified users can create posts"
 ON posts FOR INSERT
 TO authenticated
-WITH CHECK (auth.uid() = user_id);
+WITH CHECK (
+  auth.uid() = user_id AND
+  EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE id = auth.uid() AND email_verified = true
+  )
+);
 
 CREATE POLICY "Users can update their own posts"
 ON posts FOR UPDATE
@@ -84,10 +90,16 @@ ON likes FOR SELECT
 TO authenticated
 USING (true);
 
-CREATE POLICY "Users can create likes"
+CREATE POLICY "Verified users can create likes"
 ON likes FOR INSERT
 TO authenticated
-WITH CHECK (auth.uid() = user_id);
+WITH CHECK (
+  auth.uid() = user_id AND
+  EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE id = auth.uid() AND email_verified = true
+  )
+);
 
 CREATE POLICY "Users can delete their own likes"
 ON likes FOR DELETE
@@ -113,10 +125,16 @@ ON comments FOR SELECT
 TO authenticated
 USING (true);
 
-CREATE POLICY "Users can create comments"
+CREATE POLICY "Verified users can create comments"
 ON comments FOR INSERT
 TO authenticated
-WITH CHECK (auth.uid() = user_id);
+WITH CHECK (
+  auth.uid() = user_id AND
+  EXISTS (
+    SELECT 1 FROM public.profiles 
+    WHERE id = auth.uid() AND email_verified = true
+  )
+);
 
 CREATE POLICY "Users can update their own comments"
 ON comments FOR UPDATE
