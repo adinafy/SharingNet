@@ -1,6 +1,20 @@
 // Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        // בדיקה מוקדמת: אם יש פרמטרי אימות Supabase ב-URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasSupabaseAuthParams = urlParams.has('type') || urlParams.has('token') || urlParams.has('token_hash');
+        
+        if (hasSupabaseAuthParams) {
+            console.log('🔗 Supabase auth callback detected - minimal handling');
+            
+            // רק נקה את ה-URL ועצור - אל תטען כלום!
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState(null, '', cleanUrl);
+            
+            return; // עצור כאן לגמרי
+        }
+        
         console.log('🚀 SharingNet App Starting...');
         
         // Initialize cross-tab synchronization for email confirmation
