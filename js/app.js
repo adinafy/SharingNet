@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hasSupabaseAuthParams = urlParams.has('type') || urlParams.has('token') || urlParams.has('token_hash');
         
         if (hasSupabaseAuthParams) {
-            console.log('🔗 Supabase auth callback detected - minimal handling');
+            console.log('🔗hasSupabaseAuthParams זוהו פרמטרי אימות Supabase ב-URL - מנקה ועוצר');
             
             // רק נקה את ה-URL ועצור - אל תטען כלום!
             const cleanUrl = window.location.origin + window.location.pathname;
