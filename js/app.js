@@ -6,17 +6,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const hasSupabaseAuthParams = urlParams.has('type') || urlParams.has('token') || urlParams.has('token_hash');
         
         if (hasSupabaseAuthParams) {
-            console.log('🔗hasSupabaseAuthParams זוהו פרמטרי אימות Supabase ב-URL - מנקה ועוצר');
+            console.log('🔗 זוהו פרמטרי אימות Supabase - מציג מסך ומעבד ברקע');
             
-            // נקה את ה-URL
-            const cleanUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState(null, '', cleanUrl);
-            
-            // הצג מסך אימות מיוחד
+            // מיד הצג את מסך האימות (חוויית משתמש מהירה)
             showEmailVerificationSuccessScreen();
             
-            console.log('✅ מסך אימות מייל הוצג בהצלחה');
-            return; // עצור כאן - אין צורך באפליקציה המלאה
+            // ברקע - תן ל-Supabase זמן לעבד את האימות
+            setTimeout(() => {
+                console.log('🔗 מנקה פרמטרי URL לאחר עיבוד Supabase');
+                const cleanUrl = window.location.origin + window.location.pathname;
+                window.history.replaceState(null, '', cleanUrl);
+            }, 3000); // 3 שניות לעיבוד ברקע
+            
+            return; // עצור את טעינת האפליקציה
         }
         
         console.log('🚀 SharingNet App Starting...');
