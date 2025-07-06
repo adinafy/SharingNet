@@ -49,10 +49,6 @@ const UserLogin = {
                     await PostLoader.load();
                     MessageManager.success('ברוכים הבאים! התחברת בהצלחה.');
                 } else {
-                    // Create verification section if it doesn't exist
-                    if (!DOM.verificationSection) {
-                        VerificationUI.create();
-                    }
                     // Show verification section if email not verified
                     NavigationUI.showVerificationSection();
                     const emailEl = document.getElementById('verificationEmail');
