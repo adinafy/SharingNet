@@ -11,9 +11,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             // מיד הצג את מסך האימות (חוויית משתמש מהירה)
             showEmailVerificationProcessScreen();
             
-            await initializeSupabaseComponents();
+            // בדוק שהאתחול עבר בהצלחה
+            const initSupabaseSuccess = await initializeSupabaseComponents();
             
-            showEmailVerificationSuccessScreen();
+            if (initSupabaseSuccess) {
+                showEmailVerificationSuccessScreen();
+            } else {
+                // הצג מסך שגיאה
+                console.log ('initializeSupabaseComponents failed');
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 50px; font-family: Arial; background: #f5f5f5; min-height: 100vh;">
+                        <div style="background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto;">
+                            <h1 style="color: #dc3545;">❌ שגיאה באתחול</h1>
+                            <p style="font-size: 18px; margin: 20px 0;">לא ניתן היה לאתחל את המערכת כראוי.</p>
+                            
+                            <button onclick="closeVerificationScreen()" style="
+                                background: #dc3545; 
+                                color: white; 
+                                border: none; 
+                                padding: 15px 30px; 
+                                font-size: 16px; 
+                                border-radius: 5px; 
+                                cursor: pointer;
+                                margin-top: 20px;
+                            ">
+                                סגור
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
             
             return; // עצור את טעינת האפליקציה
         }

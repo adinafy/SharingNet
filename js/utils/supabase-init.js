@@ -28,7 +28,16 @@ async function initializeSupabaseComponents() {
             
             // Don't auto-navigate after email confirmation
             if (!handledEmailConfirmation) {
-                await EmailVerificationChecker.check(false); // false = from auth state change
+                await EmailVerificationChecker.check(false);
+            } else {
+                // ✅ הוסף כאן - כתוב ל-localStorage לסנכרון בין טאבים
+                await EmailVerificationChecker.check(false);
+                
+                if (AppState.isEmailVerified) {
+                    // Signal other tabs about successful email confirmation
+                    localStorage.setItem('sharingnet_email_confirmed', Date.now().toString());
+                    console.log('🔄 Email confirmation signaled to other tabs');
+                }
             }
         } else if (event === 'SIGNED_OUT') {
             AppState.reset();
@@ -36,5 +45,5 @@ async function initializeSupabaseComponents() {
         }
     });
     
-    return ;
+    return true; // ✅ החזר true
 } 
