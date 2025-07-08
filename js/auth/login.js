@@ -39,16 +39,30 @@ const UserLogin = {
 
                 // Set current user in state
                 AppState.setCurrentUser(data.user);
-                
+
+                // 🔍 DEBUG: Check auth user data
+                console.log('🔍 Login Debug - Auth User Data:');
+                console.log('  - User ID:', data.user.id);
+                console.log('  - Email:', data.user.email);
+                console.log('  - email_confirmed_at:', data.user.email_confirmed_at);
+                console.log('  - Raw user object:', data.user);
+
                 // Check email verification status
+                console.log('🔍 Running EmailVerificationChecker...');
                 await EmailVerificationChecker.check(true);
-                
+
+                console.log('🔍 After verification check:');
+                console.log('  - AppState.userProfile:', AppState.userProfile);
+                console.log('  - AppState.isEmailVerified:', AppState.isEmailVerified);
+
                 // If email is verified, proceed to main app
                 if (AppState.isEmailVerified) {
+                    console.log('✅ Email verified - showing main app');
                     NavigationUI.showMainApp();
                     await PostLoader.load();
                     MessageManager.success('ברוכים הבאים! התחברת בהצלחה.');
                 } else {
+                    console.log('❌ Email not verified - showing verification section');
                     // Show verification section if email not verified
                     NavigationUI.showVerificationSection();
                     const emailEl = document.getElementById('verificationEmail');
