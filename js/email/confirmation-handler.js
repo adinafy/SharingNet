@@ -13,12 +13,34 @@ const EmailConfirmationHandler = {
             if (type === 'email') {
                 console.log('🔗 Email verification link detected');
                 
-                // ✅ עבד את פרמטרי האימות דרך Supabase
-                const { data, error } = await supabase.auth.getSession();
-                console.log('🔗 Current session after URL processing:', data);
+                // ✅ עבד את פרמטרי האימות דרך Supabase (PKCE flow)
+                const token_hash = urlParams.get('token_hash');
+                console.log('🔗 Token hash from URL:', token_hash);
                 
-                if (error) {
-                    console.error('🔗 Error getting session:', error);
+                if (token_hash) {
+                    console.log('🔗 Processing email verification with token hash...');
+                    try {
+                        const { data, error } = await supabase.auth.verifyOtp({
+                            token_hash: token_hash,
+                            type: 'email'
+                        });
+                        console.log('🔗 Verification result data:', data);
+                        console.log('🔗 Verification result error:', error);
+                        
+                        if (error) {
+                            console.error('🔗 Error verifying email:', error);
+                            return false; // ❌ החזר false במקרה של שגיאה
+                        } else {
+                            console.log('🔗 Email verification successful!');
+                            // עכשיו Supabase אמור להפעיל את onAuthStateChange עם SIGNED_IN
+                        }
+                    } catch (err) {
+                        console.error('🔗 Exception during verification:', err);
+                        return false;
+                    }
+                } else {
+                    console.log('🔗 No token_hash found in URL');
+                    return false;
                 }
                 
                 // Clean URL parameters AFTER processing
