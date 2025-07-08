@@ -13,12 +13,18 @@ const EmailConfirmationHandler = {
             if (type === 'email') {
                 console.log('🔗 Email verification link detected');
                 
-                // Clean URL parameters
+                // ✅ עבד את פרמטרי האימות דרך Supabase
+                const { data, error } = await supabase.auth.getSession();
+                console.log('🔗 Current session after URL processing:', data);
+                
+                if (error) {
+                    console.error('🔗 Error getting session:', error);
+                }
+                
+                // Clean URL parameters AFTER processing
                 const cleanUrl = window.location.origin + window.location.pathname;
                 window.history.replaceState(null, '', cleanUrl);
                 
-                // אימות המייל כבר התבצע ע"י Supabase
-                // לא מעלים שום מסך או הודעה
                 console.log('🔗 Email verification handled silently');
                 
                 return true;
